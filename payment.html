@@ -43,7 +43,7 @@
 <body>
 
   <div class="payment-modal">
-    <a href="index.html" class="close-btn">×</a>
+    <a href="store.html" class="close-btn">×</a>
     <div class="title">💳 PAY & VERIFY</div>
 
     <div class="upi-box">
@@ -54,7 +54,6 @@
     <div class="amount" id="payAmount">₹0</div>
 
     <div class="qr-box">
-      <!-- YAHAN APNA QR CODE IMAGE LAGAYEIN. Agar image nahi hai toh placeholder rahega -->
       <img src="qr.png" alt="QR" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=chandccseller@fam%26pn=CARDVAULT'">
     </div>
     
@@ -62,17 +61,14 @@
 
     <div class="timer-box" id="timerDisplay">⏳ 05:00</div>
 
-    <!-- Email Input (Delivery ke liye) -->
     <div class="input-group">
       <input type="email" id="userEmail" class="input-field" placeholder="Enter Email (For Card Delivery)" required>
     </div>
 
-    <!-- UTR Input -->
     <div class="input-group">
       <input type="text" id="utrInput" class="input-field" placeholder="Enter 12-Digit UTR Number" maxlength="12">
     </div>
 
-    <!-- Screenshot Upload -->
     <div class="input-group">
       <div class="file-upload-wrapper">
         <div class="file-upload-btn" id="fileName">📸 Attach Payment Screenshot</div>
@@ -89,7 +85,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // APNA FIREBASE CONFIG (Realtime Database ke saath)
     const firebaseConfig = {
       apiKey: "AIzaSyBR6FK9QudfPXNouskLoex2Ft9hi3F1k2I",
       authDomain: "card-vault-f0838.firebaseapp.com",
@@ -103,12 +98,11 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Global function to save order
     window.saveOrderToFirebase = async function(orderData) {
       try {
         await push(ref(db, 'orders'), orderData);
         alert(`✅ Payment Submitted!\nOrder ID: ${orderData.orderId}\nAdmin will verify and send card to: ${orderData.email}`);
-        window.location.href = 'index.html';
+        window.location.href = 'store.html';
       } catch (e) {
         console.error("Error adding document: ", e);
         alert("Error submitting order. Please try again.");
@@ -128,7 +122,7 @@
       localStorage.setItem('current_order_product', product);
       localStorage.setItem('current_order_price', price);
 
-      startTimer(5 * 60); // 5 minute ka timer
+      startTimer(5 * 60);
     }
 
     function copyUPI() {
@@ -185,12 +179,23 @@
           status: "PENDING"
       };
 
-      // Call the Firebase function
+      // 1. User ki History mein save karo
+      let newOrder = { 
+          bank: product, 
+          network: "UPI", 
+          last4: utr.slice(-4), 
+          price: price, 
+          date: new Date().toLocaleString(),
+          orderId: orderId
+      };
+      let history = JSON.parse(localStorage.getItem('vault_history')) || [];
+      history.push(newOrder);
+      localStorage.setItem('vault_history', JSON.stringify(history));
+
+      // 2. Firebase mein save karo
       window.saveOrderToFirebase(orderData);
 
-      // Telegram par bhi bhej do
-      let tgMsg = `🚨 *NEW PENDING ORDER* 🚨%0A👤 User: ${user}%0A📧 Email: ${email}%0A💳 Card: ${product}%0A💰 Price: ₹${price}%0A🔢 UTR: ${utr}%0A🆔 Order ID: ${orderId}`;
-      window.open(`https://t.me/KaivexMods?text=${tgMsg}`, '_blank');
+      // Telegram wala code yahan se hata diya gaya hai
     }
   </script>
 </body>

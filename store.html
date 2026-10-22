@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CARD VAULT - Premium Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #050505; color: #fff; font-family: 'Share Tech Mono', monospace; padding-bottom: 60px; background-image: radial-gradient(circle at 50% 0%, rgba(57,255,20,0.05) 0%, transparent 50%); min-height: 100vh; }
+  
+  header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #0a0f0a; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; }
+  .logo { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800; letter-spacing: 1px; }
+  .logo span { color: #39ff14; }
+  .header-right { display: flex; align-items: center; gap: 15px; }
+  .balance-badge { background: rgba(57,255,20,0.1); border: 1px solid #39ff14; padding: 5px 10px; border-radius: 20px; font-size: 0.85rem; color: #39ff14; font-weight: bold; }
+  .icon-btn { font-size: 1.3rem; text-decoration: none; color: #fff; position: relative; }
+  
+  .bonus-banner { margin: 15px 20px; background: linear-gradient(90deg, rgba(57,255,20,0.1), transparent); border: 1px solid #39ff14; border-radius: 10px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; }
+  .bonus-text { font-size: 0.8rem; color: #ccc; }
+  .bonus-text span { color: #39ff14; font-weight: bold; }
+  .claim-btn { background: #39ff14; color: #000; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; font-family: inherit; cursor: pointer; }
+  
+  .search-box { margin: 15px 20px; position: relative; }
+  .search-box input { width: 100%; background: #111; border: 1px solid #333; padding: 12px 15px; border-radius: 10px; color: #fff; font-family: inherit; outline: none; }
+  .search-box input:focus { border-color: #39ff14; }
+  
+  .tabs-container { display: flex; gap: 10px; overflow-x: auto; padding: 0 20px 15px; scrollbar-width: none; }
+  .tab { padding: 8px 20px; border-radius: 20px; border: 1px solid #333; color: #aaa; font-size: 0.85rem; white-space: nowrap; cursor: pointer; background: transparent; font-family: inherit; }
+  .tab.active { background: #39ff14; color: #000; border-color: #39ff14; font-weight: bold; }
+  
+  .product-grid { padding: 0 20px; display: grid; grid-template-columns: 1fr; gap: 20px; }
+  
+  /* CARD DESIGN */
+  .card-container { background: #0a0f0a; border: 1px solid #1a3b1a; border-radius: 20px; padding: 15px; box-shadow: 0 10px 30px rgba(0,255,0,0.05); }
+  .card-design { width: 100%; height: 200px; border-radius: 15px; padding: 20px; position: relative; overflow: hidden; background: linear-gradient(135deg, #0f1a12 0%, #0a100c 100%); border: 1px solid #1c3a23; }
+  .card-top { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 2; }
+  .flag-currency { display: flex; align-items: center; gap: 8px; font-size: 1rem; color: #fff; font-weight: bold; }
+  .tier-label { color: #39ff14; font-style: italic; font-size: 0.9rem; }
+  .chip-row { display: flex; align-items: center; gap: 10px; margin-top: 15px; position: relative; z-index: 2; }
+  .chip { width: 40px; height: 30px; background: linear-gradient(135deg, #d4af37, #ffd700, #b8860b); border-radius: 5px; }
+  .contactless { color: #888; font-size: 1.2rem; transform: rotate(90deg); }
+  .card-number { font-size: 1.3rem; color: #fff; letter-spacing: 2px; margin-top: 15px; position: relative; z-index: 2; }
+  .card-bottom { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 15px; position: relative; z-index: 2; }
+  .info-label { font-size: 0.55rem; color: #888; margin-bottom: 2px; }
+  .info-value { font-size: 0.85rem; color: #fff; }
+  .network-logo { font-size: 1.1rem; font-weight: bold; font-style: italic; color: #fff; }
+  
+  /* CARD DETAILS */
+  .details-section { padding: 15px 5px 5px 5px; }
+  .tags-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .tag { background: rgba(57, 255, 20, 0.1); color: #39ff14; border: 1px solid rgba(57, 255, 20, 0.3); padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; }
+  .rating { color: #ffd700; font-size: 0.8rem; }
+  .balance-text { color: #39ff14; font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; }
+  .stock-row { display: flex; justify-content: space-between; font-size: 0.7rem; color: #aaa; margin-bottom: 5px; }
+  .stock-low { color: #ff3333; }
+  .progress-bar { width: 100%; height: 4px; background: #1a1a1a; border-radius: 2px; margin-bottom: 15px; overflow: hidden; }
+  .progress-fill { height: 100%; background: #39ff14; }
+  .buy-btn { width: 100%; background: #39ff14; color: #000; border: none; padding: 15px; border-radius: 10px; font-family: inherit; font-size: 1rem; font-weight: bold; cursor: pointer; }
+  
+  .toast-notification { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: #0a0f0a; border: 1px solid #39ff14; padding: 12px 20px; border-radius: 30px; font-size: 0.8rem; transition: 0.5s; z-index: 1000; white-space: nowrap; }
+  .toast-notification.show { bottom: 20px; }
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">CARD <span>VAULT</span></div>
+    <div class="header-right">
+      <div class="balance-badge">BAL: ₹<span id="headerBalance">0</span></div>
+      <a href="profile.html" class="icon-btn">👤</a>
+    </div>
+  </header>
+
+  <div class="bonus-banner" id="bonusBanner">
+    <div class="bonus-text">Daily Bonus: Claim <span>₹5</span> (Expires in 5 Days)</div>
+    <button class="claim-btn" onclick="claimBonus()">CLAIM</button>
+  </div>
+
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="🔍 Search by Bank or Card..." onkeyup="filterSearch()">
+  </div>
+
+  <div class="tabs-container">
+    <button class="tab active" onclick="filterTab('ALL')">ALL</button>
+    <button class="tab" onclick="filterTab('VISA')">VISA</button>
+    <button class="tab" onclick="filterTab('MASTERCARD')">MASTERCARD</button>
+    <button class="tab" onclick="filterTab('RUPAY')">RUPAY</button>
+    <button class="tab" onclick="filterTab('AMEX')">AMEX</button>
+  </div>
+
+  <div class="product-grid" id="productGrid"></div>
+  <div class="toast-notification" id="toast">🟢 Someone just bought a card!</div>
+
+  <!-- Main Store Logic -->
+  <script>
+    const products = [
+      // VISA (8)
+      { id: 1, bank: "HDFC", network: "VISA", tier: "Premium", price: 450, balMin: 5000, balMax: 6000, last4: "4329", owner: "SHIVAM KUMAR", stock: 4, rating: 4.8 },
+      { id: 2, bank: "SBI", network: "VISA", tier: "Gold", price: 500, balMin: 6000, balMax: 7500, last4: "8472", owner: "PRIYA PATEL", stock: 6, rating: 4.5 },
+      { id: 3, bank: "ICICI", network: "VISA", tier: "Platinum", price: 600, balMin: 7500, balMax: 9000, last4: "1290", owner: "AMIT KUMAR", stock: 3, rating: 4.9 },
+      { id: 4, bank: "AXIS", network: "VISA", tier: "Signature", price: 750, balMin: 9000, balMax: 12000, last4: "5634", owner: "NEHA SINGH", stock: 8, rating: 4.7 },
+      { id: 5, bank: "KOTAK", network: "VISA", tier: "Premium", price: 900, balMin: 12000, balMax: 15000, last4: "2093", owner: "VIKRAM VERMA", stock: 5, rating: 4.6 },
+      { id: 6, bank: "HDFC", network: "VISA", tier: "Infinite", price: 1100, balMin: 15000, balMax: 20000, last4: "6715", owner: "ANJALI GUPTA", stock: 2, rating: 5.0 },
+      { id: 7, bank: "SBI", network: "VISA", tier: "Gold", price: 1400, balMin: 20000, balMax: 25000, last4: "3928", owner: "ROHIT YADAV", stock: 7, rating: 4.4 },
+      { id: 8, bank: "ICICI", network: "VISA", tier: "Platinum", price: 1800, balMin: 25000, balMax: 35000, last4: "9104", owner: "SONIA REDDY", stock: 4, rating: 4.8 },
+
+      // MASTERCARD (8)
+      { id: 9, bank: "AXIS", network: "MASTERCARD", tier: "Premium", price: 420, balMin: 4500, balMax: 5500, last4: "4567", owner: "KARAN MEHTA", stock: 6, rating: 4.5 },
+      { id: 10, bank: "KOTAK", network: "MASTERCARD", tier: "Gold", price: 480, balMin: 5500, balMax: 7000, last4: "8032", owner: "DIVYA JOSHI", stock: 9, rating: 4.7 },
+      { id: 11, bank: "HDFC", network: "MASTERCARD", tier: "Platinum", price: 550, balMin: 7000, balMax: 8500, last4: "2761", owner: "MANOJ TIWARI", stock: 3, rating: 4.9 },
+      { id: 12, bank: "SBI", network: "MASTERCARD", tier: "World", price: 700, balMin: 8500, balMax: 11000, last4: "6183", owner: "RAJESH NAIR", stock: 5, rating: 4.6 },
+      { id: 13, bank: "ICICI", network: "MASTERCARD", tier: "Premium", price: 850, balMin: 11000, balMax: 14000, last4: "9057", owner: "KAVITA DESAI", stock: 2, rating: 4.8 },
+      { id: 14, bank: "AXIS", network: "MASTERCARD", tier: "World Elite", price: 1200, balMin: 16000, balMax: 22000, last4: "3472", owner: "ARJUN MALHOTRA", stock: 4, rating: 5.0 },
+      { id: 15, bank: "KOTAK", network: "MASTERCARD", tier: "Gold", price: 1600, balMin: 22000, balMax: 28000, last4: "7819", owner: "SNEHA IYER", stock: 1, rating: 4.9 },
+      { id: 16, bank: "HDFC", network: "MASTERCARD", tier: "Platinum", price: 2000, balMin: 28000, balMax: 40000, last4: "4821", owner: "HARSH VARDHAN", stock: 3, rating: 4.7 },
+
+      // RUPAY (8)
+      { id: 17, bank: "SBI", network: "RUPAY", tier: "Classic", price: 410, balMin: 4000, balMax: 5000, last4: "1246", owner: "POOJA SHARMA", stock: 8, rating: 4.3 },
+      { id: 18, bank: "ICICI", network: "RUPAY", tier: "Gold", price: 460, balMin: 5000, balMax: 6500, last4: "8593", owner: "SANJAY PATIL", stock: 6, rating: 4.5 },
+      { id: 19, bank: "AXIS", network: "RUPAY", tier: "Platinum", price: 520, balMin: 6500, balMax: 8000, last4: "4628", owner: "MEERA KRISHNAN", stock: 4, rating: 4.7 },
+      { id: 20, bank: "KOTAK", network: "RUPAY", tier: "Select", price: 650, balMin: 8000, balMax: 10000, last4: "9315", owner: "ARUN CHAUHAN", stock: 5, rating: 4.6 },
+      { id: 21, bank: "HDFC", network: "RUPAY", tier: "Gold", price: 800, balMin: 10000, balMax: 13000, last4: "5074", owner: "RITU BANSAL", stock: 3, rating: 4.8 },
+      { id: 22, bank: "SBI", network: "RUPAY", tier: "Platinum", price: 1000, balMin: 13000, balMax: 18000, last4: "7903", owner: "NIKHIL RAO", stock: 7, rating: 4.5 },
+      { id: 23, bank: "ICICI", network: "RUPAY", tier: "Classic", price: 1300, balMin: 18000, balMax: 24000, last4: "2861", owner: "TANVI SHAH", stock: 2, rating: 4.9 },
+      { id: 24, bank: "AXIS", network: "RUPAY", tier: "Select", price: 1700, balMin: 24000, balMax: 32000, last4: "6457", owner: "GAURAV SINGH", stock: 4, rating: 4.6 },
+
+      // AMEX (8)
+      { id: 25, bank: "AMEX", network: "AMEX", tier: "Gold", price: 800, balMin: 12000, balMax: 15000, last4: "8294", owner: "JOHN SMITH", stock: 5, rating: 4.8 },
+      { id: 26, bank: "AMEX", network: "AMEX", tier: "Platinum", price: 1100, balMin: 15000, balMax: 20000, last4: "4736", owner: "MICHAEL JOHNSON", stock: 3, rating: 4.9 },
+      { id: 27, bank: "AMEX", network: "AMEX", tier: "Green", price: 1500, balMin: 20000, balMax: 26000, last4: "1085", owner: "DAVID WILLIAMS", stock: 4, rating: 4.7 },
+      { id: 28, bank: "AMEX", network: "AMEX", tier: "Centurion", price: 2200, balMin: 26000, balMax: 35000, last4: "9628", owner: "ROBERT BROWN", stock: 2, rating: 5.0 },
+      { id: 29, bank: "AMEX", network: "AMEX", tier: "Platinum", price: 3000, balMin: 35000, balMax: 45000, last4: "5371", owner: "JAMES JONES", stock: 6, rating: 4.8 },
+      { id: 30, bank: "AMEX", network: "AMEX", tier: "Gold", price: 4200, balMin: 45000, balMax: 60000, last4: "8046", owner: "PATRICIA GARCIA", stock: 1, rating: 4.6 },
+      { id: 31, bank: "AMEX", network: "AMEX", tier: "Green", price: 5500, balMin: 60000, balMax: 80000, last4: "2953", owner: "LINDA MARTINEZ", stock: 3, rating: 4.9 },
+      { id: 32, bank: "AMEX", network: "AMEX", tier: "Centurion", price: 7500, balMin: 80000, balMax: 110000, last4: "6719", owner: "ELIZABETH DAVIS", stock: 2, rating: 5.0 }
+    ];
+
+    let currentTab = 'ALL';
+    let searchQuery = '';
+
+    function renderProducts() {
+      const grid = document.getElementById('productGrid');
+      grid.innerHTML = '';
+
+      let filtered = products.filter(p => {
+        let matchTab = currentTab === 'ALL' || p.network === currentTab;
+        let matchSearch = p.bank.toLowerCase().includes(searchQuery) || p.network.toLowerCase().includes(searchQuery);
+        return matchTab && matchSearch;
+      });
+
+      if(filtered.length === 0) {
+        grid.innerHTML = `<div style="text-align:center; padding:50px; color:#888;">No cards found.</div>`;
+        return;
+      }
+
+      filtered.forEach(p => {
+        let stockClass = p.stock <= 2 ? 'stock-low' : '';
+        let stockWidth = (p.stock / 10) * 100;
+
+        grid.innerHTML += `
+          <div class="card-container">
+            <div class="card-design">
+              <div class="card-top">
+                <div class="flag-currency">🇺🇸 USD</div>
+                <div class="tier-label">${p.tier}</div>
+              </div>
+              <div class="chip-row">
+                <div class="chip"></div>
+                <div class="contactless">)))</div>
+              </div>
+              <div class="card-number">
+                **** **** **** ${p.last4}
+              </div>
+              <div class="card-bottom">
+                <div>
+                  <div class="info-label">MONTH/YEAR</div>
+                  <div class="info-value">${Math.floor(Math.random() * 12) + 1}/2${Math.floor(Math.random() * 5) + 5}</div>
+                  <div class="info-value" style="margin-top: 5px; font-size: 0.75rem;">${p.owner}</div>
+                </div>
+                <div style="text-align:right;">
+                  <div class="info-label">DEBIT CARD</div>
+                  <div class="network-logo">${p.network === 'MASTERCARD' ? 'Mastercard' : p.network}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="details-section">
+              <div class="tags-row">
+                <div class="tag">${p.network}</div>
+                <div class="rating">★ ${p.rating} (${Math.floor(Math.random()*50)+10})</div>
+              </div>
+              <div class="balance-text">BAL: ₹${p.balMin.toLocaleString()} - ₹${p.balMax.toLocaleString()}</div>
+              
+              <div class="stock-row">
+                <div>STOCK PROTOCOL</div>
+                <div class="${stockClass}">${p.stock <= 2 ? 'HURRY! ONLY ' + p.stock + ' LEFT' : p.stock + ' LEFT'}</div>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: ${stockWidth}%; ${p.stock <= 2 ? 'background:#ff3333;' : ''}"></div>
+              </div>
+              
+              <button class="buy-btn" onclick="buyCard(${p.id})">BUY NOW | ₹${p.price}</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function filterTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      event.target.classList.add('active');
+      renderProducts();
+    }
+
+    function filterSearch() {
+      searchQuery = document.getElementById('searchInput').value.toLowerCase();
+      renderProducts();
+    }
+
+    // ===== BUY LOGIC (Direct Payment Page) =====
+    function buyCard(id) {
+      let card = products.find(p => p.id === id);
+      
+      // Bina popup ke direct payment page par bhejo
+      window.location.href = `payment.html?price=${card.price}&product=${card.bank} ${card.network}`;
+    }
+
+    function claimBonus() {
+      let lastClaim = localStorage.getItem('last_bonus_claim');
+      let now = Date.now();
+      let fiveDays = 5 * 24 * 60 * 60 * 1000; 
+
+      if(lastClaim && (now - lastClaim < fiveDays)) {
+        alert("⚠️ You have already claimed your bonus. It expires after 5 days.");
+        return;
+      }
+
+      let bal = parseInt(localStorage.getItem('vault_balance') || '0');
+      bal += 5;
+      localStorage.setItem('vault_balance', bal);
+      localStorage.setItem('last_bonus_claim', now);
+      
+      document.getElementById('headerBalance').innerText = bal;
+      document.getElementById('bonusBanner').style.display = 'none';
+      alert("🎉 You claimed ₹5 Daily Bonus! It expires in 5 days.");
+    }
+
+    function startFakeNotifications() {
+      const names = ["Rahul", "Amit", "Priya", "Vikram", "Sneha", "Arjun", "Karan"];
+      const cards = ["VISA Premium", "Mastercard Gold", "RuPay Platinum", "AMEX Centurion"];
+      let toast = document.getElementById('toast');
+
+      setInterval(() => {
+        let randomName = names[Math.floor(Math.random() * names.length)];
+        let randomCard = cards[Math.floor(Math.random() * cards.length)];
+        
+        toast.innerText = `🟢 ${randomName} just bought a ${randomCard}`;
+        toast.classList.add('show');
+
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3000);
+
+      }, 12000); 
+    }
+
+    window.onload = function() {
+      let bal = localStorage.getItem('vault_balance') || '0';
+      document.getElementById('headerBalance').innerText = bal;
+
+      let lastClaim = localStorage.getItem('last_bonus_claim');
+      if(lastClaim) {
+        let now = Date.now();
+        let fiveDays = 5 * 24 * 60 * 60 * 1000;
+        if(now - lastClaim < fiveDays) {
+          document.getElementById('bonusBanner').style.display = 'none';
+        }
+      }
+
+      renderProducts();
+      startFakeNotifications();
+    }
+  </script>
+
+  <!-- FIREBASE ANNOUNCEMENT LISTENER -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBR6FK9QudfPXNouskLoex2Ft9hi3F1k2I",
+      authDomain: "card-vault-f0838.firebaseapp.com",
+      projectId: "card-vault-f0838",
+      databaseURL: "https://card-vault-f0838-default-rtdb.firebaseio.com/", 
+      storageBucket: "card-vault-f0838.firebasestorage.app",
+      messagingSenderId: "298533932235",
+      appId: "1:298533932235:web:e6f6fc371646fe72eddf4e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const annRef = ref(db, 'announcement');
+    onValue(annRef, (snapshot) => {
+      const data = snapshot.val();
+      if(data && data.message) {
+        let seenMsg = localStorage.getItem('seen_announcement');
+        if(seenMsg !== data.message) {
+            alert(`📢 ANNOUNCEMENT FROM ADMIN:\n\n${data.message}`);
+            localStorage.setItem('seen_announcement', data.message);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
