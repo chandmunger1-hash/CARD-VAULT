@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security Check - CARD VAULT</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #020503; background-image: linear-gradient(rgba(57, 255, 20, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(57, 255, 20, 0.03) 1px, transparent 1px); background-size: 20px 20px; color: #fff; font-family: 'Share Tech Mono', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; overflow: hidden; }
+  
+  .security-box { width: 100%; max-width: 380px; border: 1px solid rgba(57, 255, 20, 0.4); border-radius: 20px; padding: 40px 25px; position: relative; background: rgba(2, 10, 4, 0.8); backdrop-filter: blur(10px); box-shadow: inset 0 0 30px rgba(57, 255, 20, 0.05), 0 0 20px rgba(0, 0, 0, 0.8); }
+  
+  .security-box::before, .security-box::after { content: ''; position: absolute; width: 30px; height: 30px; border: 2px solid #39ff14; box-shadow: 0 0 10px rgba(57,255,20,0.5); }
+  .security-box::before { top: -1px; left: -1px; border-right: none; border-bottom: none; border-top-left-radius: 20px; }
+  .security-box::after { bottom: -1px; right: -1px; border-left: none; border-top: none; border-bottom-right-radius: 20px; }
+  
+  .shield-container { display: flex; justify-content: center; margin-bottom: 30px; position: relative; }
+  .shield-ring { width: 100px; height: 100px; border: 1px dashed rgba(57, 255, 20, 0.5); border-radius: 50%; display: flex; justify-content: center; align-items: center; animation: spin 10s linear infinite; }
+  @keyframes spin { 100% { transform: rotate(360deg); } }
+  
+  .shield-icon { font-size: 3.5rem; color: #39ff14; text-shadow: 0 0 20px rgba(57, 255, 20, 0.6); animation: pulse 1.5s infinite alternate; }
+  @keyframes pulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.1); opacity: 1; } }
+  
+  .title { text-align: center; font-size: 1.8rem; letter-spacing: 2px; color: #fff; margin-bottom: 10px; line-height: 1.2; }
+  .subtitle { text-align: center; font-size: 0.85rem; color: #8fbc8f; margin-bottom: 35px; line-height: 1.5; }
+  
+  .progress-container { margin-bottom: 30px; }
+  .status-row { display: flex; justify-content: space-between; font-size: 0.8rem; color: #fff; letter-spacing: 1px; margin-bottom: 8px; }
+  .status-percent { color: #fff; font-weight: bold; }
+  .progress-track { width: 100%; height: 8px; background: #111; border-radius: 4px; overflow: hidden; border: 1px solid #222; }
+  .progress-fill { width: 0%; height: 100%; background: #39ff14; box-shadow: 0 0 10px #39ff14; transition: width 0.1s linear; }
+  
+  .decrypt-box { background: #000; border: 1px solid #222; border-radius: 10px; padding: 15px; text-align: center; font-size: 1rem; color: #39ff14; letter-spacing: 2px; position: relative; }
+  .decrypt-cursor { display: inline-block; width: 10px; height: 15px; background: #39ff14; vertical-align: middle; margin-left: 5px; animation: blink 1s infinite; }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+</style>
+</head>
+<body>
+
+  <div class="security-box">
+    <div class="shield-container">
+      <div class="shield-ring">
+        <div class="shield-icon">🛡️</div>
+      </div>
+    </div>
+    
+    <div class="title">SECURITY<br>CHECK</div>
+    <div class="subtitle">Establishing encrypted quantum<br>connection...</div>
+    
+    <div class="progress-container">
+      <div class="status-row">
+        <div>SYSTEM STATUS</div>
+        <div class="status-percent" id="percentText">0%</div>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressBar"></div>
+      </div>
+    </div>
+    
+    <div class="decrypt-box" id="decryptText">INITIALIZING<span class="decrypt-cursor"></span></div>
+  </div>
+
+  <script>
+    let progress = 0;
+    let bar = document.getElementById('progressBar');
+    let percentText = document.getElementById('percentText');
+    let decryptText = document.getElementById('decryptText');
+    
+    let interval = setInterval(() => {
+      progress += Math.floor(Math.random() * 5) + 1; 
+      
+      if (progress >= 100) {
+        progress = 100; 
+        clearInterval(interval);
+        decryptText.innerHTML = "ACCESS GRANTED ✅";
+        setTimeout(() => { window.location.href = 'login.html'; }, 1000);
+      }
+      
+      bar.style.width = progress + '%';
+      percentText.innerText = progress + '%';
+      
+      if (progress > 30 && progress < 70) { 
+        decryptText.innerHTML = "DECRYPTING<span class='decrypt-cursor'></span>"; 
+      } 
+      else if (progress >= 70 && progress < 100) { 
+        decryptText.innerHTML = "VERIFYING IDENTITY<span class='decrypt-cursor'></span>"; 
+      }
+    }, 100);
+  </script>
+</body>
+</html>

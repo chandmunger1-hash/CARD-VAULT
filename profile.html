@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile - CARD VAULT</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #050505; color: #fff; font-family: 'Share Tech Mono', monospace; padding: 20px; padding-bottom: 50px; background-image: radial-gradient(circle at 50% 0%, rgba(57,255,20,0.05) 0%, transparent 50%); min-height: 100vh;}
+  
+  .header { display: flex; align-items: center; margin-bottom: 25px; gap: 15px; }
+  .back-btn { color: #39ff14; text-decoration: none; font-size: 1.5rem; background: #111; padding: 5px 15px; border-radius: 8px; border: 1px solid #333; }
+  .title { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; }
+
+  .profile-card { background: #0a0f0a; border: 1px solid rgba(57,255,20,0.3); border-radius: 20px; padding: 30px 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); margin-bottom: 20px; }
+  .avatar { width: 80px; height: 80px; background: #111; border: 2px solid #39ff14; border-radius: 50%; margin: 0 auto 15px; display: flex; justify-content: center; align-items: center; font-size: 2.5rem; color: #39ff14; box-shadow: 0 0 20px rgba(57,255,20,0.2); }
+  .username { font-size: 1.5rem; font-family: 'Syne', sans-serif; font-weight: bold; margin-bottom: 5px; }
+  
+  .stats-row { display: flex; justify-content: space-around; border-top: 1px solid #222; border-bottom: 1px solid #222; padding: 15px 0; margin: 20px 0; }
+  .stat-item { text-align: center; }
+  .stat-val { font-size: 1.3rem; color: #39ff14; font-weight: bold; text-shadow: 0 0 10px rgba(57,255,20,0.3); }
+  .stat-label { font-size: 0.7rem; color: #888; letter-spacing: 1px; margin-top: 5px; }
+
+  .referral-box { background: #111; border: 1px dashed #39ff14; border-radius: 10px; padding: 15px; margin-bottom: 20px; }
+  .ref-title { font-size: 0.75rem; color: #aaa; margin-bottom: 10px; }
+  .ref-code { font-size: 1.5rem; color: #39ff14; font-weight: bold; letter-spacing: 2px; }
+  .copy-btn { background: #39ff14; color: #000; border: none; padding: 8px 15px; border-radius: 5px; font-family: 'Share Tech Mono', monospace; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
+  .menu-btn { display: flex; justify-content: space-between; width: 100%; background: #111; color: #fff; border: 1px solid #333; padding: 15px 20px; border-radius: 10px; font-family: 'Share Tech Mono', monospace; font-size: 1rem; cursor: pointer; margin-bottom: 15px; text-decoration: none; transition: 0.3s;}
+  .menu-btn span { color: #39ff14; font-size: 1.2rem; }
+  .logout-btn { width: 100%; background: transparent; color: #ff3333; border: 1px solid #ff3333; padding: 15px; border-radius: 10px; font-family: 'Share Tech Mono', monospace; font-size: 1rem; cursor: pointer; transition: 0.3s; }
+
+  /* Referral History Section */
+  .ref-history-box { background: #0a0f0a; border: 1px solid #222; border-radius: 15px; padding: 20px; }
+  .ref-history-title { font-size: 0.9rem; color: #39ff14; margin-bottom: 15px; border-bottom: 1px dashed #333; padding-bottom: 10px; }
+  
+  .ref-item { border: 1px solid #222; padding: 15px; border-radius: 10px; margin-bottom: 15px; background: #050505;}
+  .ref-user-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .ref-user-name { color: #fff; font-weight: bold; }
+  
+  .step-box { display: flex; justify-content: space-between; font-size: 0.75rem; padding: 8px; border-radius: 5px; margin-top: 5px; }
+  .step-unlocked { background: rgba(57,255,20,0.1); color: #39ff14; border: 1px solid rgba(57,255,20,0.3); }
+  .step-locked { background: rgba(255,255,255,0.05); color: #666; border: 1px solid #333; }
+</style>
+</head>
+<body>
+
+  <div class="header">
+    <a href="index.html" class="back-btn">←</a>
+    <div class="title">MY PROFILE</div>
+  </div>
+
+  <div class="profile-card">
+    <div class="avatar">👤</div>
+    <div class="username" id="profileUsername">Loading...</div>
+
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-val" id="userBalance">₹0</div>
+        <div class="stat-label">WALLET BAL</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-val" id="userRefsCount">0</div>
+        <div class="stat-label">TOTAL REFS</div>
+      </div>
+    </div>
+
+    <div class="referral-box">
+      <div class="ref-title">YOUR REFERRAL CODE</div>
+      <div class="ref-code" id="refCode">LOADING...</div>
+      <button class="copy-btn" onclick="copyCode()">COPY CODE</button>
+    </div>
+
+    <a href="history.html" class="menu-btn">
+      <span>📜 View Order History</span>
+      <span>→</span>
+    </a>
+
+    <button class="logout-btn" onclick="logout()">LOGOUT SECURELY</button>
+  </div>
+
+  <!-- Referral History Section -->
+  <div class="ref-history-box">
+    <div class="ref-history-title">REFERRAL STATUS (EARN ₹50 PER USER)</div>
+    <div id="refHistoryList">
+      <!-- List JS se aayegi -->
+    </div>
+  </div>
+
+  <script>
+    window.onload = function() {
+      let user = localStorage.getItem('vault_user') || 'Guest';
+      document.getElementById('profileUsername').innerText = user;
+      
+      let refCode = "VAULT-" + user.substring(0,3).toUpperCase() + Math.floor(1000 + Math.random() * 9000);
+      document.getElementById('refCode').innerText = refCode;
+
+      let bal = localStorage.getItem('vault_balance') || '0'; 
+      document.getElementById('userBalance').innerText = "₹" + bal;
+
+      let refHistoryList = document.getElementById('refHistoryList');
+      let refCount = localStorage.getItem('vault_ref_count') || '0';
+      
+      document.getElementById('userRefsCount').innerText = refCount;
+
+      if(refCount > 0) {
+        // UI mein Step 1 (₹5) unlocked, baaki locked
+        let html = `
+          <div class="ref-item">
+            <div class="ref-user-header">
+              <span class="ref-user-name">👤 Friend (Joined via your code)</span>
+            </div>
+            
+            <div class="step-box step-unlocked">
+              <span>✅ Step 1: Refer Used</span>
+              <span>+₹5 Unlocked</span>
+            </div>
+            
+            <div class="step-box step-locked">
+              <span>🔒 Step 2: 1st Order</span>
+              <span>₹15 Locked</span>
+            </div>
+
+            <div class="step-box step-locked">
+              <span>🔒 Step 3: 3rd Order</span>
+              <span>₹30 Locked</span>
+            </div>
+          </div>
+        `;
+        refHistoryList.innerHTML = html;
+      } else {
+        refHistoryList.innerHTML = `<div style="font-size:0.8rem; color:#666; text-align:center;">No referrals yet. Share your code to earn!</div>`;
+      }
+    }
+
+    function copyCode() {
+      let code = document.getElementById('refCode').innerText;
+      navigator.clipboard.writeText(code);
+      alert("Referral Code Copied: " + code);
+    }
+
+    function logout() {
+      localStorage.removeItem('vault_logged_in'); 
+      window.location.href = 'loader.html';
+    }
+  </script>
+</body>
+</html>

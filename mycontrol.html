@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Control - CARD VAULT</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #050505; color: #fff; font-family: 'Share Tech Mono', monospace; padding: 20px; }
+  
+  h1 { color: #ff3333; text-align: center; margin-bottom: 20px; font-size: 1.5rem; }
+  
+  /* Announcement Section */
+  .announcement-box { background: #0a0f0a; border: 1px solid #39ff14; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+  .announcement-box h3 { font-size: 0.9rem; color: #39ff14; margin-bottom: 10px; }
+  .announcement-box input { width: 100%; padding: 12px; background: #111; border: 1px solid #333; color: #fff; border-radius: 8px; margin-bottom: 10px; outline: none; }
+  .announcement-box button { width: 100%; padding: 12px; background: #39ff14; color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+  /* Order Cards */
+  .order-card { background: #0a0f0a; border: 1px solid #333; border-radius: 15px; padding: 15px; margin-bottom: 15px; }
+  .order-header { display: flex; justify-content: space-between; border-bottom: 1px dashed #333; padding-bottom: 10px; margin-bottom: 10px; }
+  .order-id { color: #39ff14; font-weight: bold; }
+  
+  .order-details p { font-size: 0.85rem; margin-bottom: 8px; color: #ccc; }
+  .order-details span { color: #fff; font-weight: bold; }
+  
+  .action-btns { display: flex; gap: 10px; margin-top: 15px; }
+  .btn { flex: 1; padding: 12px; border: none; border-radius: 8px; font-family: inherit; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
+  .btn-approve { background: #39ff14; color: #000; }
+  .btn-reject { background: #ff3333; color: #fff; }
+  .btn-edit { background: #ffa500; color: #000; margin-top: 10px; width: 100%; }
+</style>
+</head>
+<body>
+
+  <h1>👑 ADMIN CONTROL PANEL</h1>
+
+  <!-- Announcement Section -->
+  <div class="announcement-box">
+    <h3>📢 Send Announcement to All Users</h3>
+    <input type="text" id="announcementText" placeholder="Type a message (e.g., 50% OFF Today!)">
+    <button onclick="sendAnnouncement()">SEND ANNOUNCEMENT</button>
+  </div>
+
+  <div id="ordersList"><div class="loading">Fetching Live Orders...</div></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, onValue, update, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // APNA FIREBASE CONFIG
+    const firebaseConfig = {
+      apiKey: "AIzaSyBR6FK9QudfPXNouskLoex2Ft9hi3F1k2I",
+      authDomain: "card-vault-f0838.firebaseapp.com",
+      projectId: "card-vault-f0838",
+      databaseURL: "https://card-vault-f0838-default-rtdb.firebaseio.com/", 
+      storageBucket: "card-vault-f0838.firebasestorage.app",
+      messagingSenderId: "298533932235",
+      appId: "1:298533932235:web:e6f6fc371646fe72eddf4e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    let list = document.getElementById('ordersList');
+
+    // 1. ANNOUNCEMENT FUNCTION
+    window.sendAnnouncement = async function() {
+      let msg = document.getElementById('announcementText').value;
+      if(!msg) { alert("Please enter a message"); return; }
+      
+      await set(ref(db, 'announcement'), {
+        message: msg,
+        timestamp: Date.now()
+      });
+      
+      alert("✅ Announcement Sent Live!");
+      document.getElementById('announcementText').value = '';
+    }
+
+    // 2. FETCH ORDERS
+    function fetchOrders() {
+      const ordersRef = ref(db, 'orders');
+      onValue(ordersRef, (snapshot) => {
+        const data = snapshot.val();
+        
+        if(!data) {
+          list.innerHTML = `<div style="text-align:center; color:#666;">No orders yet.</div>`;
+          return;
+        }
+
+        list.innerHTML = ''; 
+        let ordersArray = Object.keys(data).map(key => {
+          return { firebaseKey: key, ...data[key] };
+        });
+
+        let pendingOrders = ordersArray.filter(o => o.status === 'PENDING');
+
+        if(pendingOrders.length === 0) {
+          list.innerHTML = `<div style="text-align:center; color:#666;">No PENDING orders right now.</div>`;
+          return;
+        }
+
+        pendingOrders.reverse().forEach((order) => {
+          list.innerHTML += `
+            <div class="order-card">
+              <div class="order-header">
+                <div class="order-id">${order.orderId}</div>
+                <div style="color:orange; font-size:0.8rem;">PENDING</div>
+              </div>
+              <div class="order-details">
+                <p>👤 User: <span>${order.user}</span></p>
+                <p>📧 Email: <span style="color:#39ff14;">${order.email}</span></p>
+                <p>💳 Card: <span>${order.product}</span></p>
+                <p>💰 Price: <span id="price-display-${order.firebaseKey}">₹${order.price}</span></p>
+                <p>🔢 UTR: <span>${order.utr}</span></p>
+              </div>
+              
+              <button class="btn btn-edit" onclick="editPrice('${order.firebaseKey}')">✏️ Edit Order Price</button>
+
+              <div class="action-btns">
+                <button class="btn btn-approve" onclick="updateStatus('${order.firebaseKey}', 'APPROVED', '${order.email}')">✅ Approve</button>
+                <button class="btn btn-reject" onclick="updateStatus('${order.firebaseKey}', 'REJECTED', '${order.email}')">❌ Reject</button>
+              </div>
+            </div>
+          `;
+        });
+      });
+    }
+
+    // 3. EDIT PRICE FUNCTION (Updated: Screen par turant update hoga)
+    window.editPrice = async function(firebaseKey) {
+      let newPrice = prompt("Enter new price for this order (in ₹):");
+      
+      if(newPrice !== null && newPrice.trim() !== "" && !isNaN(newPrice)) {
+        try {
+          const orderRef = ref(db, 'orders/' + firebaseKey);
+          await update(orderRef, { price: parseInt(newPrice) });
+          
+          // Bina page refresh hue screen par price update karo
+          document.getElementById(`price-display-${firebaseKey}`).innerText = "₹" + newPrice;
+          
+          alert(`✅ Price updated successfully to ₹${newPrice}`);
+        } catch (e) {
+          alert("❌ Error updating price. Please check your internet.");
+        }
+      } else if (newPrice !== null) {
+        alert("⚠️ Please enter a valid number.");
+      }
+    }
+
+    // 4. UPDATE STATUS
+    window.updateStatus = async function(firebaseKey, newStatus, email) {
+      try {
+        const orderRef = ref(db, 'orders/' + firebaseKey);
+        await update(orderRef, { status: newStatus });
+        if(newStatus === 'APPROVED') { alert(`✅ Approved! Send Card to: ${email}`); } 
+        else { alert(`❌ Rejected.`); }
+      } catch (e) { alert("Error!"); }
+    }
+
+    fetchOrders();
+  </script>
+</body>
+</html>

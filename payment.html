@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout - CARD VAULT</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #050505; color: #fff; font-family: 'Share Tech Mono', monospace; padding-bottom: 50px; background-image: radial-gradient(circle at 50% 0%, rgba(57,255,20,0.05) 0%, transparent 50%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+  
+  .payment-modal { width: 100%; max-width: 400px; background: #0a0f0a; border: 2px solid #39ff14; border-radius: 20px; padding: 25px; box-shadow: 0 0 40px rgba(57,255,20,0.15); position: relative; text-align: center; }
+  
+  .close-btn { position: absolute; top: 15px; right: 20px; color: #fff; font-size: 1.5rem; text-decoration: none; cursor: pointer; }
+  .close-btn:hover { color: #ff3333; }
+  
+  .title { font-size: 1.2rem; color: #39ff14; font-weight: bold; margin-bottom: 15px; letter-spacing: 1px; display: flex; justify-content: center; align-items: center; gap: 8px; }
+  
+  .upi-box { display: inline-flex; align-items: center; justify-content: space-between; background: #111; border: 1px solid #333; padding: 10px 15px; border-radius: 30px; width: 100%; margin-bottom: 15px; }
+  .upi-id { color: #ccc; font-size: 0.85rem; }
+  .copy-btn { background: transparent; border: none; color: #39ff14; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
+  
+  .amount { font-size: 2.5rem; color: #39ff14; font-weight: bold; text-shadow: 0 0 15px rgba(57,255,20,0.4); margin-bottom: 20px; }
+  
+  .qr-box { background: #fff; padding: 10px; border-radius: 15px; display: inline-block; margin-bottom: 20px; box-shadow: 0 0 20px rgba(57,255,20,0.2); }
+  .qr-box img { width: 180px; height: 180px; display: block; border-radius: 10px; }
+  
+  .timer-box { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid #39ff14; color: #39ff14; padding: 8px 30px; border-radius: 30px; font-size: 1.1rem; font-weight: bold; margin-bottom: 25px; box-shadow: 0 0 10px rgba(57,255,20,0.2); width: auto; }
+  
+  .input-group { margin-bottom: 15px; text-align: left; }
+  .input-field { width: 100%; background: #111; border: 1px solid #333; padding: 15px; border-radius: 10px; color: #fff; font-family: 'Share Tech Mono', monospace; outline: none; font-size: 0.9rem; }
+  .input-field:focus { border-color: #39ff14; box-shadow: 0 0 10px rgba(57,255,20,0.2); }
+  
+  .file-upload-wrapper { position: relative; overflow: hidden; display: inline-block; width: 100%; }
+  .file-upload-wrapper input[type=file] { font-size: 100px; position: absolute; left: 0; top: 0; opacity: 0; cursor: pointer; }
+  .file-upload-btn { background: #111; border: 1px dashed #555; padding: 15px; border-radius: 10px; color: #aaa; font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; width: 100%; text-align: center; transition: 0.3s; }
+  .file-upload-wrapper:hover .file-upload-btn { border-color: #39ff14; color: #39ff14; }
+  
+  .verify-btn { width: 100%; background: #39ff14; color: #000; border: none; padding: 18px; border-radius: 10px; font-family: 'Share Tech Mono', monospace; font-size: 1.2rem; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; transition: 0.3s; box-shadow: 0 0 20px rgba(57,255,20,0.3); }
+  .verify-btn:hover { background: #fff; }
+</style>
+</head>
+<body>
+
+  <div class="payment-modal">
+    <a href="index.html" class="close-btn">×</a>
+    <div class="title">💳 PAY & VERIFY</div>
+
+    <div class="upi-box">
+      <span class="upi-id">UPI: chandccseller@fam</span>
+      <button class="copy-btn" onclick="copyUPI()">COPY</button>
+    </div>
+
+    <div class="amount" id="payAmount">₹0</div>
+
+    <div class="qr-box">
+      <!-- YAHAN APNA QR CODE IMAGE LAGAYEIN. Agar image nahi hai toh placeholder rahega -->
+      <img src="qr.png" alt="QR" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=upi://pay?pa=chandccseller@fam%26pn=CARDVAULT'">
+    </div>
+    
+    <br>
+
+    <div class="timer-box" id="timerDisplay">⏳ 05:00</div>
+
+    <!-- Email Input (Delivery ke liye) -->
+    <div class="input-group">
+      <input type="email" id="userEmail" class="input-field" placeholder="Enter Email (For Card Delivery)" required>
+    </div>
+
+    <!-- UTR Input -->
+    <div class="input-group">
+      <input type="text" id="utrInput" class="input-field" placeholder="Enter 12-Digit UTR Number" maxlength="12">
+    </div>
+
+    <!-- Screenshot Upload -->
+    <div class="input-group">
+      <div class="file-upload-wrapper">
+        <div class="file-upload-btn" id="fileName">📸 Attach Payment Screenshot</div>
+        <input type="file" id="screenshotInput" accept="image/*" onchange="document.getElementById('fileName').innerText = '✅ ' + this.files[0].name">
+      </div>
+    </div>
+
+    <button class="verify-btn" onclick="submitPayment()">✔ SUBMIT FOR VERIFICATION</button>
+
+  </div>
+
+  <!-- FIREBASE SDK AND LOGIC -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    // APNA FIREBASE CONFIG (Realtime Database ke saath)
+    const firebaseConfig = {
+      apiKey: "AIzaSyBR6FK9QudfPXNouskLoex2Ft9hi3F1k2I",
+      authDomain: "card-vault-f0838.firebaseapp.com",
+      projectId: "card-vault-f0838",
+      databaseURL: "https://card-vault-f0838-default-rtdb.firebaseio.com/", 
+      storageBucket: "card-vault-f0838.firebasestorage.app",
+      messagingSenderId: "298533932235",
+      appId: "1:298533932235:web:e6f6fc371646fe72eddf4e"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Global function to save order
+    window.saveOrderToFirebase = async function(orderData) {
+      try {
+        await push(ref(db, 'orders'), orderData);
+        alert(`✅ Payment Submitted!\nOrder ID: ${orderData.orderId}\nAdmin will verify and send card to: ${orderData.email}`);
+        window.location.href = 'index.html';
+      } catch (e) {
+        console.error("Error adding document: ", e);
+        alert("Error submitting order. Please try again.");
+      }
+    }
+  </script>
+
+  <!-- PAGE LOGIC -->
+  <script>
+    window.onload = function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      let price = urlParams.get('price') || '150';
+      let product = urlParams.get('product') || 'VISA Card';
+      
+      document.getElementById('payAmount').innerText = "₹" + price;
+      
+      localStorage.setItem('current_order_product', product);
+      localStorage.setItem('current_order_price', price);
+
+      startTimer(5 * 60); // 5 minute ka timer
+    }
+
+    function copyUPI() {
+      navigator.clipboard.writeText('chandccseller@fam');
+      alert('UPI ID Copied: chandccseller@fam');
+    }
+
+    function startTimer(duration) {
+      let timer = duration, minutes, seconds;
+      let display = document.getElementById('timerDisplay');
+      
+      let interval = setInterval(function () {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.innerText = "⏳ " + minutes + ":" + seconds;
+
+        if (--timer < 0) {
+          clearInterval(interval);
+          display.innerText = "SESSION EXPIRED";
+          display.style.color = "#ff3333";
+          display.style.borderColor = "#ff3333";
+          document.querySelector('.verify-btn').disabled = true;
+          document.querySelector('.verify-btn').style.opacity = '0.5';
+        }
+      }, 1000);
+    }
+
+    function submitPayment() {
+      let email = document.getElementById('userEmail').value;
+      let utr = document.getElementById('utrInput').value;
+      let file = document.getElementById('screenshotInput').files.length;
+
+      if(!email.includes('@')) { alert("⚠️ Please enter a valid Email ID."); return; }
+      if(utr.length < 12) { alert("⚠️ Please enter a valid 12-digit UTR number."); return; }
+      if(file === 0) { alert("⚠️ Please attach the payment screenshot."); return; }
+
+      let product = localStorage.getItem('current_order_product');
+      let price = localStorage.getItem('current_order_price');
+      let orderId = "ORD" + Math.floor(100000 + Math.random() * 900000);
+      let user = localStorage.getItem('vault_user') || 'Guest';
+
+      let orderData = { 
+          orderId: orderId,
+          user: user,
+          email: email,
+          product: product,
+          price: price,
+          utr: utr,
+          date: new Date().toLocaleString(),
+          status: "PENDING"
+      };
+
+      // Call the Firebase function
+      window.saveOrderToFirebase(orderData);
+
+      // Telegram par bhi bhej do
+      let tgMsg = `🚨 *NEW PENDING ORDER* 🚨%0A👤 User: ${user}%0A📧 Email: ${email}%0A💳 Card: ${product}%0A💰 Price: ₹${price}%0A🔢 UTR: ${utr}%0A🆔 Order ID: ${orderId}`;
+      window.open(`https://t.me/KaivexMods?text=${tgMsg}`, '_blank');
+    }
+  </script>
+</body>
+</html>
