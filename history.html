@@ -40,7 +40,22 @@
   
   .card-price { text-align: right; }
   .card-price .amount { font-size: 1.2rem; color: #39ff14; font-weight: bold; }
-  .card-price .status { font-size: 0.7rem; color: #00ff00; background: rgba(0,255,0,0.1); padding: 2px 8px; border-radius: 10px; margin-top: 5px; display: inline-block; border: 1px solid rgba(0,255,0,0.3);}
+  
+  /* Naya Status Style (PENDING ke liye Orange) */
+  .status-badge { 
+    font-size: 0.7rem; 
+    padding: 2px 8px; 
+    border-radius: 10px; 
+    margin-top: 5px; 
+    display: inline-block; 
+    border: 1px solid;
+    font-weight: bold;
+  }
+  .status-pending {
+    color: #ffa500; 
+    background: rgba(255,165,0,0.1); 
+    border-color: #ffa500;
+  }
 
   .empty-history { text-align: center; color: #666; margin-top: 50px; }
   .empty-history span { font-size: 3rem; display: block; margin-bottom: 10px; }
@@ -68,7 +83,8 @@
           <div class="empty-history">
             <span>📭</span>
             <p>No orders found.</p>
-            <a href="index.html" style="color:#39ff14; text-decoration:none; margin-top:15px; display:inline-block; border:1px solid #39ff14; padding:10px 20px; border-radius:8px;">Go to Store →</a>
+            <!-- Link store.html par bhej raha hai -->
+            <a href="store.html" style="color:#39ff14; text-decoration:none; margin-top:15px; display:inline-block; border:1px solid #39ff14; padding:10px 20px; border-radius:8px;">Go to Store →</a>
           </div>
         `;
         return;
@@ -85,7 +101,8 @@
             </div>
             <div class="card-price">
               <div class="amount">₹${item.price}</div>
-              <div class="status">SUCCESS</div>
+              <!-- SUCCESS ki jagah PENDING dikhega -->
+              <div class="status-badge status-pending">PENDING</div>
             </div>
           </div>
         `;
